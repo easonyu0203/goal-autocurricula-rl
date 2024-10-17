@@ -1,3 +1,5 @@
 .vscode
 /logs
+/output
 *.zip
+__pycache__/
