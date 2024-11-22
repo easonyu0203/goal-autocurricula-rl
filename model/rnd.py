@@ -8,7 +8,6 @@ class RandomTargetNetwork(nn.Module):
         super(RandomTargetNetwork, self).__init__()
         c, h, w = input_shape
 
-        # Using nn.Sequential for better readability
         self.conv_layers = nn.Sequential(
             nn.Conv2d(c, convfeat, kernel_size=8, stride=4),
             nn.LeakyReLU(),
@@ -21,7 +20,6 @@ class RandomTargetNetwork(nn.Module):
         # Calculate output size after the convolutional layers
         conv_out_size = self._get_conv_out((c, h, w))
         
-        # Fully connected layer to generate feature representation
         self.fc = nn.Linear(conv_out_size, rep_size)
 
         # Apply orthogonal initialization
@@ -54,7 +52,6 @@ class PredictorNetwork(nn.Module):
         super(PredictorNetwork, self).__init__()
         c, h, w = input_shape
 
-        # Using nn.Sequential for better readability
         self.conv_layers = nn.Sequential(
             nn.Conv2d(c, convfeat, kernel_size=8, stride=4),
             nn.LeakyReLU(),
@@ -162,7 +159,6 @@ class DRNDModel(nn.Module):
     
 
 class RunningMeanStd(object):
-    # https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm
     def __init__(self, epsilon=1e-4, shape=()):
         self.mean = np.zeros(shape, 'float64')
         self.var = np.ones(shape, 'float64')

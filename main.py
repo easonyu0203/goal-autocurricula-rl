@@ -1,87 +1,67 @@
 import gymnasium as gym
 import ale_py
-import argparse
 import os
 
-from stable_baselines3 import PPO
-from stable_baselines3.common.policies import ActorCriticCnnPolicy
-from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
+from stable_baselines3.ppo import RNDPPO
+from stable_baselines3.common.policies import RNDActorCriticPolicy
+from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 from stable_baselines3.common.vec_env.vec_frame_stack import VecFrameStack
 from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
 
-from common.nonepisodic_wrapper import NonEpisodicWrapper
 
-tb_log_name = "ppo_pacman_episodic"
-model_name = "ppo_pacman"
-n_envs = 18
+tb_log_name = "Walker2d-v4-[0,1]"
+model_name = "Walker2d-v4"
+n_envs = 32
 n_steps = 128
 checkpoint_file = None
-save_freq = 500_000
+save_freq = 100_000 # Never save
 save_path = "output"
 resume_from_checkpoint = False
 total_timesteps = 1_000_000
 
 def main():
-    gym.register_envs(ale_py)
-
     def make_env(n_envs: int = 1):
         def _make_env():
-            env = gym.make(
-                'ALE/MsPacman-v5',
-                obs_type='rgb',
-                render_mode="rgb_array",
-                mode=0
-            )
-            env = AtariWrapper(
-                env,
-                noop_max=250,
-                frame_skip=5,
-                screen_size=64,
-                terminal_on_life_loss=True,
-                clip_reward=True,
-                action_repeat_probability=0.0,
-                grayscale_obs=False,
-            )
+            env = gym.make("Walker2d-v4", render_mode="rgb_array") 
             env = Monitor(env)
-            # env = NonEpisodicWrapper(env) # terminated is always False
             return env
 
-        env = SubprocVecEnv([_make_env for _ in range(n_envs)])
-        env = VecFrameStack(env, n_stack=4)
-
+        env = DummyVecEnv([_make_env for _ in range(n_envs)])
         return env
 
     env = make_env(n_envs=n_envs)
     mini_batch_size = n_steps * n_envs // 4
 
 
-
     if resume_from_checkpoint and os.path.exists(checkpoint_file):
         print(f"Resuming training from checkpoint: {checkpoint_file}")
-        ppo = PPO.load(checkpoint_file, env=env, device='cuda')
+        ppo = RNDPPO.load(checkpoint_file, env=env, device='cuda')
     else:
         print("Starting training from scratch...")
         # Creating the PPO model
-        ppo = PPO(
-            policy=ActorCriticCnnPolicy,
+        ppo = RNDPPO(
+            policy=RNDActorCriticPolicy,
             policy_kwargs={
                 'share_features_extractor': True,
-                'normalize_images': True
+                'normalize_images': True,
+                'ortho_init': True,
+                'rnd_feature_dim': 24,
             },
             env=env,
             learning_rate=lambda _: 3e-4,  # Constant learning rate
             n_steps=n_steps,
             batch_size=mini_batch_size,
             n_epochs=10,
-            gamma=0.99,
+            gamma=0.9999,
             gae_lambda=0.95,
             clip_range=0.1,
             clip_range_vf=1,
             normalize_advantage=True,
             ent_coef=0.001,
             vf_coef=1,
+            rnd_coef=0.1,
             target_kl=0.01,
             tensorboard_log='logs',
             device='cuda',
