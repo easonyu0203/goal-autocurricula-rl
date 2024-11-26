@@ -13,8 +13,10 @@ from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from stable_baselines3.ppo import RNDPPO
 
-model_path = 'output/checkpoints/MontezumaRevenge_7999488_steps.zip'
-video_folder = 'output/videos/MontezumaRevenge'
+# model_path = '/hdd/eyu/output/MontezumaRevenge-non-episodic-ext/checkpoints/MontezumaRevenge_49999880_steps.zip'
+# video_folder = 'output/videos/MontezumaRevenge-non-episodic-ext'
+model_path = '/hdd/eyu/output/MontezumaRevenge-non-episodic-with-ext/checkpoints/MontezumaRevenge_70000000_steps.zip'
+video_folder = 'output/videos/MontezumaRevenge-non-episodic-with-ext'
 
 class MergeFrameWrapper(gym.ObservationWrapper):
     def __init__(self, env):
@@ -67,11 +69,12 @@ def main():
 
     while not done:
         with torch.no_grad():
-            action, _states = model.predict(obs, deterministic=True)
+            action, _states = model.predict(obs)
             obs, reward, terminated, truncated, info = env.step(action)
 
             # comput intrinsic reward
             obs_th = obs_as_tensor(np.array([obs]), device=model.policy.device)
+            obs_th = obs_th[:, -1:, :, :]
             intr_reward = model.policy.compute_intrinsic_reward(obs_th)
             rewards_list.append(intr_reward.item())
 

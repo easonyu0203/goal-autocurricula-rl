@@ -12,13 +12,14 @@ from stable_baselines3.common.vec_env.vec_frame_stack import VecFrameStack
 from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
 
 
-tb_log_name = "MontezumaRevenge-non-episodic"
+tb_log_name = "MontezumaRevenge-non-episodic-with-ext"
 model_name = "MontezumaRevenge"
-n_envs = 28
+n_envs = 32
 n_steps = 128
 checkpoint_file = None
-save_freq = 1_000_000
-save_path = "output"
+save_freq = 10_000_000
+save_path = "/hdd/eyu/output/MontezumaRevenge-non-episodic-with-ext"
+log_dir = "/hdd/eyu/output/logs"
 resume_from_checkpoint = False
 total_timesteps = 1_000_000_000_000
 non_episodic=True
@@ -73,7 +74,7 @@ def main():
             extr_reward_coef=1.0,
             rnd_update_proportion=0.25,
             target_kl=0.01,
-            tensorboard_log='logs',
+            tensorboard_log=log_dir,
             device='cuda',
             verbose=1
         )
