@@ -12,13 +12,13 @@ from stable_baselines3.common.vec_env.vec_frame_stack import VecFrameStack
 from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
 
 
-tb_log_name = "MontezumaRevenge-non-episodic-with-ext"
+tb_log_name = "MontezumaRevenge-non-episodic-only-intr-bigger"
 model_name = "MontezumaRevenge"
-n_envs = 32
-n_steps = 128
+n_envs = 128
+n_steps = 256
 checkpoint_file = None
 save_freq = 10_000_000
-save_path = "/hdd/eyu/output/MontezumaRevenge-non-episodic-with-ext"
+save_path = "/hdd/eyu/output/MontezumaRevenge-non-episodic-only-intr-bigger"
 log_dir = "/hdd/eyu/output/logs"
 resume_from_checkpoint = False
 total_timesteps = 1_000_000_000_000
@@ -55,9 +55,12 @@ def main():
                 'ortho_init': True,
                 'rnd_feature_dim': 512,
                 'features_extractor_class': NatureCNN,
+                'features_extractor_kwargs': {
+                    'features_dim': 448
+                }
             },
             env=env,
-            learning_rate=lambda _: 3e-4,  # Constant learning rate
+            learning_rate=lambda _: 1e-4,  # Constant learning rate
             n_steps=n_steps,
             batch_size=mini_batch_size,
             n_epochs=4,
@@ -69,9 +72,9 @@ def main():
             normalize_advantage=True,
             ent_coef=0.001,
             vf_coef=1,
-            rnd_coef=0.1,
+            rnd_coef=1,
             intr_reward_coef=1.0,
-            extr_reward_coef=1.0,
+            extr_reward_coef=0.0,
             rnd_update_proportion=0.25,
             target_kl=0.01,
             tensorboard_log=log_dir,

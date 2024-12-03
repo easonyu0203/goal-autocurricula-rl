@@ -13,9 +13,9 @@ from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from stable_baselines3.ppo import RNDPPO
 
-# model_path = '/hdd/eyu/output/MontezumaRevenge-non-episodic-ext/checkpoints/MontezumaRevenge_49999880_steps.zip'
-# video_folder = 'output/videos/MontezumaRevenge-non-episodic-ext'
-model_path = '/hdd/eyu/output/MontezumaRevenge-non-episodic-with-ext/checkpoints/MontezumaRevenge_70000000_steps.zip'
+# model_path = '/hdd/eyu/output/MontezumaRevenge-non-episodic-only-intr/checkpoints/MontezumaRevenge_40000000_steps.zip'
+# video_folder = 'output/videos/MontezumaRevenge-non-episodic-only-intr'
+model_path = '/hdd/eyu/output/MontezumaRevenge-non-episodic-only-intr-bigger/checkpoints/MontezumaRevenge_20000000_steps.zip'
 video_folder = 'output/videos/MontezumaRevenge-non-episodic-with-ext'
 
 class MergeFrameWrapper(gym.ObservationWrapper):
