@@ -28,8 +28,8 @@ n_frame_stack = 4
 def main():
     def make_env(n_envs: int = 1):
         def _make_env():
-            env = gym.make("ALE/MontezumaRevenge", render_mode="rgb_array") 
-            env = AtariWrapper(env)
+            env = gym.make("ALE/MontezumaRevenge-v5", render_mode="rgb_array") 
+            env = AtariWrapper(env, action_repeat_probability=0, frame_skip=1, terminal_on_life_loss=False)
             env = Monitor(env)
             return env
 
